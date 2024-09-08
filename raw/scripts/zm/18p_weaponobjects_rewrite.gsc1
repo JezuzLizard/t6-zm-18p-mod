@@ -1,0 +1,211 @@
+#include maps\mp\gametypes_zm\_globallogic_score;
+#include maps\mp\zombies\_zm_utility;
+#include maps\mp\_utility;
+#include common_scripts\utility;
+#include maps\mp\gametypes_zm\_hud_util;
+
+#define _weaponobjects maps\mp\gametypes_zm\_weaponobjects
+
+#define SAFE_REPLACEFUNC( file, func_str, to ) \
+	func = getfunction( file, func_str ); \
+	if ( func ) \
+		replacefunc( func, to );
+
+main()
+{
+	replacefunc( getfunction( "maps/mp/zombies/_zm_weapons", "weaponobjects_on_player_connect_override" ), ::weaponobjects_on_player_connect_override_override );
+
+	SAFE_REPLACEFUNC( "maps/mp/zombies/_zm_equip_turret", "setupwatchers", ::setupwatchers_turret );
+	SAFE_REPLACEFUNC( "maps/mp/zombies/_zm_equip_electrictrap", "setupwatchers", ::setupwatchers_electric_trap );
+
+	on_pre_player_disconnect_callback( ::on_player_disconnect );
+	onplayerconnect_callback( ::on_player_connect );
+}
+
+on_pre_startgametype_callback( func )
+{
+	addcallback( "on_pre_startgametype", func );
+}
+
+on_post_startgametype_callback( func )
+{
+	addcallback( "on_post_startgametype", func );
+}
+
+on_pre_player_connect_callback( func )
+{
+	addcallback( "on_pre_player_connect", func );
+}
+
+on_post_player_connect_callback( func )
+{
+	addcallback( "on_post_player_connect", func );
+}
+
+on_pre_player_disconnect_callback( func )
+{
+	addcallback( "on_pre_player_disconnect", func );
+}
+
+on_post_player_disconnect_callback( func )
+{
+	addcallback( "on_post_player_disconnect", func );
+}
+
+on_pre_player_damage_callback( func )
+{
+	addcallback( "on_pre_player_damage", func );
+}
+
+on_post_player_damage_callback( func )
+{
+	addcallback( "on_post_player_damage", func );
+}
+
+on_pre_player_killed_callback( func )
+{
+	addcallback( "on_pre_player_killed", func );
+}
+
+on_post_player_killed_callback( func )
+{
+	addcallback( "on_post_player_killed", func );
+}
+
+on_pre_player_laststand_callback( func )
+{
+	addcallback( "on_pre_player_laststand", func );
+}
+
+on_post_player_laststand_callback( func )
+{
+	addcallback( "on_pre_player_laststand", func );
+}
+
+on_pre_player_melee_callback( func )
+{
+	addcallback( "on_pre_player_melee", func );
+}
+
+on_post_player_melee_callback( func )
+{
+	addcallback( "on_post_player_melee", func );
+}
+
+on_pre_actor_damage_callback( func )
+{
+	addcallback( "on_pre_actor_damage", func );
+}
+
+on_post_actor_damage_callback( func )
+{
+	addcallback( "on_post_actor_damage", func );
+}
+
+on_pre_actor_killed_callback( func )
+{
+	addcallback( "on_pre_actor_killed", func );
+}
+
+on_post_actor_killed_callback( func )
+{
+	addcallback( "on_post_actor_killed", func );
+}
+
+on_pre_menu_response_callback( func )
+{
+	addcallback( "on_pre_menu_response", func );
+}
+
+on_post_menu_response_callback( func )
+{
+	addcallback( "on_post_menu_response", func );
+}
+
+on_player_connect()
+{
+	self thread watchweaponusagezm();
+	self.lastfiretime = 0;
+	self.hasdonecombat = 0;
+}
+
+on_player_disconnect()
+{
+	guid = self getguid() + "";
+
+	keys = getarraykeys( level.weaponobjectwatcherarray );
+	foreach ( key in keys )
+	{
+		assert( isdefined( level.weaponobjectwatcherarray[ key ].subscribers[ guid ] ) );
+		level.weaponobjectwatcherarray[ key ].subscribers[ guid ] = undefined;
+	}
+}
+
+weaponobjects_on_player_connect_override_override()
+{
+	maps\mp\zombies\_zm_weapons::add_retrievable_knife_init_name( "knife_ballistic" );
+	maps\mp\zombies\_zm_weapons::add_retrievable_knife_init_name( "knife_ballistic_upgraded" );
+
+	level weaponobjects_on_player_connect_override_internal();
+}
+
+weaponobjects_on_player_connect_override_internal()
+{
+	self maps\mp\gametypes_zm\_weaponobjects::createbasewatchers();
+	createclaymorewatcher_zm();
+
+	for ( i = 0; i < level.retrievable_knife_init_names.size; i++ )
+		createballisticknifewatcher_zm( level.retrievable_knife_init_names[i], level.retrievable_knife_init_names[i] + "_zm" );
+
+	maps\mp\gametypes_zm\_weaponobjects::setupretrievablewatcher();
+
+	if ( !isdefined( level.weaponobjectwatcherarray ) )
+		level.weaponobjectwatcherarray = [];
+
+	self thread maps\mp\gametypes_zm\_weaponobjects::watchweaponobjectspawn();
+	self thread maps\mp\gametypes_zm\_weaponobjects::watchweaponprojectileobjectspawn();
+	self thread maps\mp\gametypes_zm\_weaponobjects::deleteweaponobjectson();
+	self thread maps\mp\gametypes_zm\_weapons::watchgrenadeusage();
+	self thread maps\mp\gametypes_zm\_weapons::watchmissileusage();
+	self thread watchweaponchangezm();
+	self thread maps\mp\gametypes_zm\_weapons::watchturretuse();
+	self thread trackweaponzm();
+	self notify( "weapon_watchers_created" );
+}
+
+createclaymorewatcher_zm()
+{
+	watcher = self maps\mp\gametypes_zm\_weaponobjects::createuseweaponobjectwatcher( "claymore", "claymore_zm", self.team );
+	watcher.onspawnretrievetriggers = maps\mp\zombies\_zm_weap_claymore::on_spawn_retrieve_trigger;
+	watcher.adjusttriggerorigin = maps\mp\zombies\_zm_weap_claymore::adjust_trigger_origin;
+	watcher.pickup = level.pickup_claymores;
+	watcher.pickup_trigger_listener = level.pickup_claymores_trigger_listener;
+	watcher.skip_weapon_object_damage = 1;
+	watcher.headicon = 0;
+	watcher.watchforfire = 1;
+	watcher.detonate = ::claymoredetonate;
+	watcher.ondamage = level.claymores_on_damage;
+}
+
+createballisticknifewatcher_zm( name, weapon )
+{
+	watcher = self maps\mp\gametypes_zm\_weaponobjects::createuseweaponobjectwatcher( name, weapon, self.team );
+	watcher.onspawn = maps\mp\zombies\_zm_weap_ballistic_knife::on_spawn;
+	watcher.onspawnretrievetriggers = maps\mp\zombies\_zm_weap_ballistic_knife::on_spawn_retrieve_trigger;
+	watcher.storedifferentobject = 1;
+	watcher.headicon = 0;
+}
+
+setupwatchers_turret()
+{
+	self waittill( "weapon_watchers_created" );
+	watcher = maps\mp\gametypes_zm\_weaponobjects::getweaponobjectwatcher( "equip_electrictrap" );
+	watcher.onspawnretrievetriggers = maps\mp\zombies\_zm_equipment::equipment_onspawnretrievableweaponobject;
+}
+
+setupwatchers_electric_trap()
+{
+	self waittill( "weapon_watchers_created" );
+	watcher = maps\mp\gametypes_zm\_weaponobjects::getweaponobjectwatcher( "equip_electrictrap" );
+	watcher.onspawnretrievetriggers = maps\mp\zombies\_zm_equipment::equipment_onspawnretrievableweaponobject;
+}
