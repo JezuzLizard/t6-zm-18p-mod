@@ -3,7 +3,6 @@
 #include common_scripts\utility;
 #include maps\mp\gametypes_zm\_hud_util;
 #include maps\mp\zm_transit_distance_tracking;
-#include maps\mp\zombies\_zm_ai_screecher;
 
 #include scripts\zm\18p_optimizations;
 

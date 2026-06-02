@@ -7,17 +7,12 @@
 SAFE_REPLACEFUNC( path, func_str, to )
 {
 	func = getfunction( path, func_str );
-	if ( func )
+	if ( isdefined( func ) )
 		replacefunc( func, to );
 }
 
 main()
 {
-	if ( getdvarint( "sv_maxclients" ) <= 8 )
-	{
-		return;
-	}
-
 	// don't allocate stats to pers, unless they get read
 	SAFE_REPLACEFUNC( "maps/mp/gametypes_zm/_globallogic_score", "getpersstat", ::getpersstat_override );
 	SAFE_REPLACEFUNC( "maps/mp/gametypes_zm/_globallogic_score", "initpersstat", ::initpersstat_override );
@@ -35,9 +30,6 @@ main()
 	// don't allocate unused hudelems
 	SAFE_REPLACEFUNC( "maps/mp/gametypes_zm/_hud_message", "onplayerconnect", ::noop );
 
-	// reduce average variables allocated by manually freeing str_team before calling the builtin if it wasn't needed
-	SAFE_REPLACEFUNC( "common_scripts/utility", "get_players", ::get_players_override );
-
 	// fix bots not spawning as spectators when hotjoining
 	//SAFE_REPLACEFUNC( "maps/mp/gametypes_zm/_zm_gametype", "hide_gump_loading_for_hotjoiners", ::hide_gump_loading_for_hotjoiners_override );
 
@@ -47,15 +39,14 @@ main()
 	// fix massive waste of variables
 	// each perk a buy has at once spawns like 20 child variables
 	// 18 players with each 9 perks on Origins is probably enough to fill the variable limit by itself
-	SAFE_REPLACEFUNC( "maps/mp/zombies/_zm_perks", "give_perk", ::give_perk_override );
-	SAFE_REPLACEFUNC( "maps/mp/zombies/_zm_pers_upgrades_functions", "pers_upgrade_perk_lose_save", ::pers_upgrade_perk_lose_save_override );
-	SAFE_REPLACEFUNC( "maps/mp/zombies/_zm_perks", "lose_random_perk", ::lose_random_perk_override );
+	//SAFE_REPLACEFUNC( "maps/mp/zombies/_zm_perks", "give_perk", ::give_perk_override );
+	//SAFE_REPLACEFUNC( "maps/mp/zombies/_zm_pers_upgrades_functions", "pers_upgrade_perk_lose_save", ::pers_upgrade_perk_lose_save_override );
+	//SAFE_REPLACEFUNC( "maps/mp/zombies/_zm_perks", "lose_random_perk", ::lose_random_perk_override );
 
 	// fix minor variable leak due to not using the correct free function for the variable allocator
 	SAFE_REPLACEFUNC( "maps/mp/zombies/_zm_powerups", "full_ammo_move_hud", ::full_ammo_move_hud_override );
 
 	// use dodamage instead of delete for actors(not corpses, corpses are fine to delete)
-	SAFE_REPLACEFUNC( "maps/mp/zombies/_zm_ai_faller", "zombie_faller_delete", ::zombie_faller_delete_override );
 	SAFE_REPLACEFUNC( "maps/mp/zombies/_zm_ai_faller", "zombie_faller_delete", ::zombie_faller_delete_override );
 
 	SAFE_REPLACEFUNC( "maps/mp/zombies/_zm_utility", "track_players_intersection_tracker", ::track_players_intersection_tracker_override );
@@ -148,9 +139,6 @@ on_player_connect()
 		}
 
 		player thread onplayerspawned();
-
-		player.yuge_array = [];
-		player.yuge_array[ 65535 ] = true;
 	}
 }
 
@@ -164,7 +152,7 @@ onplayerspawned()
 		{
 			continue;
 		}
-		self sq_give_player_all_perks();
+		//self sq_give_player_all_perks();
 	}
 }
 
@@ -237,7 +225,7 @@ get_players_override( str_team )
 		return getplayers( str_team );
 	}
 
-	str_team = undefined;
+	//str_team = undefined;
 	return level.players;
 }
 
