@@ -3,20 +3,13 @@
 #include common_scripts\utility;
 #include maps\mp\zm_buried_distance_tracking;
 
-#define _weaponobjects maps\mp\gametypes_zm\_weaponobjects
-
-#define SAFE_REPLACEFUNC( file, func_str, to ) \
-	func = getfunction( file, func_str ); \
-	if ( func ) \
-		replacefunc( func, to );
-
 main()
 {
-	replacefunc( getfunction( "maps/mp/zombies/_zm_weap_time_bomb", "_restore_player_perks_and_weapons" ), ::_restore_player_perks_and_weapons_override );
-	replacefunc( getfunction( "maps/mp/zombies/_zm_weap_time_bomb", "restore_player_to_initial_loadout" ), ::restore_player_to_initial_loadout_override );
-	replacefunc( getfunction( "maps/mp/zombies/_zm_weap_time_bomb", "get_player_perk_list" ), ::get_player_perk_list_override );
-	replacefunc( getfunction( "maps/mp/_zm_weap_time_bomb", "_time_bomb_save_internal" ), ::_time_bomb_save_internal_override );
-	replacefunc( getfunction( "maps/mp/zm_buried_classic", "give_player_minigame_loadout" ), ::give_player_minigame_loadout_override );
+	SAFE_REPLACEFUNC( "maps/mp/zombies/_zm_weap_time_bomb", "_restore_player_perks_and_weapons", ::_restore_player_perks_and_weapons_override );
+	SAFE_REPLACEFUNC( "maps/mp/zombies/_zm_weap_time_bomb", "restore_player_to_initial_loadout", ::restore_player_to_initial_loadout_override );
+	SAFE_REPLACEFUNC( "maps/mp/zombies/_zm_weap_time_bomb", "get_player_perk_list", ::get_player_perk_list_override );
+	SAFE_REPLACEFUNC( "maps/mp/_zm_weap_time_bomb", "_time_bomb_save_internal", ::_time_bomb_save_internal_override );
+	SAFE_REPLACEFUNC( "maps/mp/zm_buried_classic", "give_player_minigame_loadout", ::give_player_minigame_loadout_override );
 }
 
 _restore_player_perks_and_weapons_override( s_temp )

@@ -4,17 +4,10 @@
 #include maps\mp\gametypes_zm\_hud_util;
 #include maps\mp\zm_tomb_distance_tracking;
 
-#define _weaponobjects maps\mp\gametypes_zm\_weaponobjects
-
-#define SAFE_REPLACEFUNC( file, func_str, to ) \
-	func = getfunction( file, func_str ); \
-	if ( func ) \
-		replacefunc( func, to );
-
 main()
 {
-	replacefunc( getfunction( "maps/mp/zm_tomb_capture_zones", "delete_zombie_for_capture_event" ), ::delete_zombie_for_capture_event_override );
-	replacefunc( getfunction( "maps/mp/zm_tomb_distance_tracking", "delete_zombie_noone_looking" ), ::delete_zombie_noone_looking_override );
+	SAFE_REPLACEFUNC( "maps/mp/zm_tomb_capture_zones", "delete_zombie_for_capture_event", ::delete_zombie_for_capture_event_override );
+	SAFE_REPLACEFUNC( "maps/mp/zm_tomb_distance_tracking", "delete_zombie_noone_looking", ::delete_zombie_noone_looking_override );
 }
 
 delete_zombie_for_capture_event_override()

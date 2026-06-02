@@ -5,21 +5,14 @@
 #include maps\mp\gametypes_zm\_hud_util;
 #include maps\mp\zm_highrise_distance_tracking;
 
-#define _weaponobjects maps\mp\gametypes_zm\_weaponobjects
-
-#define SAFE_REPLACEFUNC( file, func_str, to ) \
-	func = getfunction( file, func_str ); \
-	if ( func ) \
-		replacefunc( func, to );
-
 main()
 {
 	// replace delete calls with dodamage
-	replacefunc( getfunction( "maps/mp/zombies/_zm_ai_leaper", "leaper_traverse_watcher" ), ::leaper_traverse_watcher_override );
-	replacefunc( getfunction( "maps/mp/zombies/_zm_ai_leaper", "leaper_playable_area_failsafe" ), ::leaper_playable_area_failsafe_override );
-	replacefunc( getfunction( "maps/mp/zm_highrise_distance_tracking", "delete_zombie_noone_looking" ), ::delete_zombie_noone_looking_override );
-	replacefunc( getfunction( "maps/mp/zm_highrise_elevators", "watch_for_elevator_during_faller_spawn" ), ::watch_for_elevator_during_faller_spawn_override );
-	replacefunc( getfunction( "maps/mp/zm_highrise", "elevator_traverse_watcher" ), ::elevator_traverse_watcher_override );
+	SAFE_REPLACEFUNC( "maps/mp/zombies/_zm_ai_leaper", "leaper_traverse_watcher", ::leaper_traverse_watcher_override );
+	SAFE_REPLACEFUNC( "maps/mp/zombies/_zm_ai_leaper", "leaper_playable_area_failsafe", ::leaper_playable_area_failsafe_override );
+	SAFE_REPLACEFUNC( "maps/mp/zm_highrise_distance_tracking", "delete_zombie_noone_looking", ::delete_zombie_noone_looking_override );
+	SAFE_REPLACEFUNC( "maps/mp/zm_highrise_elevators", "watch_for_elevator_during_faller_spawn", ::watch_for_elevator_during_faller_spawn_override );
+	SAFE_REPLACEFUNC( "maps/mp/zm_highrise", "elevator_traverse_watcher", ::elevator_traverse_watcher_override );
 }
 
 leaper_traverse_watcher_override()

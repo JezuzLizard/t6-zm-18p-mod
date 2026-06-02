@@ -4,20 +4,13 @@
 #include maps\mp\gametypes_zm\_hud_util;
 #include maps\mp\zm_alcatraz_distance_tracking;
 
-#define _weaponobjects maps\mp\gametypes_zm\_weaponobjects
-
-#define SAFE_REPLACEFUNC( file, func_str, to ) \
-	func = getfunction( file, func_str ); \
-	if ( func ) \
-		replacefunc( func, to );
-
 main()
 {
-	replacefunc( getfunction( "maps/mp/zombies/_zm_afterlife", "afterlife_zapped" ), ::afterlife_zapped_override );
-	replacefunc( getfunction( "maps/mp/zombies/_zm_ai_brutus", "brutus_cleanup_at_end_of_grief_round" ), ::brutus_cleanup_at_end_of_grief_round_override );
-	replacefunc( getfunction( "maps/mp/zombies/_zm_ai_brutus", "brutus_stuck_teleport" ), ::brutus_stuck_teleport_override );
-	replacefunc( getfunction( "maps/mp/zombies/_zm_ai_brutus", "brutus_afterlife_teleport" ), ::brutus_afterlife_teleport_override );
-	replacefunc( getfunction( "maps/mp/zm_alcatraz_distance_tracking", "delete_zombie_noone_looking" ), ::delete_zombie_noone_looking_override );
+	SAFE_REPLACEFUNC( "maps/mp/zombies/_zm_afterlife", "afterlife_zapped", ::afterlife_zapped_override );
+	SAFE_REPLACEFUNC( "maps/mp/zombies/_zm_ai_brutus", "brutus_cleanup_at_end_of_grief_round", ::brutus_cleanup_at_end_of_grief_round_override );
+	SAFE_REPLACEFUNC( "maps/mp/zombies/_zm_ai_brutus", "brutus_stuck_teleport", ::brutus_stuck_teleport_override );
+	SAFE_REPLACEFUNC( "maps/mp/zombies/_zm_ai_brutus", "brutus_afterlife_teleport", ::brutus_afterlife_teleport_override );
+	SAFE_REPLACEFUNC( "maps/mp/zm_alcatraz_distance_tracking", "delete_zombie_noone_looking", ::delete_zombie_noone_looking_override );
 }
 
 afterlife_zapped_override()

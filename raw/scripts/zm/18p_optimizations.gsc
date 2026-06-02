@@ -4,12 +4,12 @@
 #include common_scripts\utility;
 #include maps\mp\gametypes_zm\_hud_util;
 
-#define _weaponobjects maps\mp\gametypes_zm\_weaponobjects
-
-#define SAFE_REPLACEFUNC( file, func_str, to ) \
-	func = getfunction( file, func_str ); \
-	if ( func ) \
+SAFE_REPLACEFUNC( path, func_str, to )
+{
+	func = getfunction( path, func_str );
+	if ( func )
 		replacefunc( func, to );
+}
 
 main()
 {
@@ -238,7 +238,7 @@ get_players_override( str_team )
 	}
 
 	str_team = undefined;
-	return getplayers();
+	return level.players;
 }
 
 hide_gump_loading_for_hotjoiners_override()

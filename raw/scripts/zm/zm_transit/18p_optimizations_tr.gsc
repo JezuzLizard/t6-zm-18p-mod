@@ -3,20 +3,16 @@
 #include common_scripts\utility;
 #include maps\mp\gametypes_zm\_hud_util;
 #include maps\mp\zm_transit_distance_tracking;
+#include maps\mp\zombies\_zm_ai_screecher;
 
-#define _weaponobjects maps\mp\gametypes_zm\_weaponobjects
-
-#define SAFE_REPLACEFUNC( file, func_str, to ) \
-	func = getfunction( file, func_str ); \
-	if ( func ) \
-		replacefunc( func, to );
+#include scripts\zm\18p_optimizations;
 
 main()
 {
-	replacefunc( getfunction( "maps/mp/zm_transit_distance_tracking", "delete_zombie_noone_looking" ), ::delete_zombie_noone_looking_override );
-	replacefunc( getfunction( "maps/mp/zombies/_zm_ai_screecher", "zombie_pathing_home" ), ::zombie_pathing_home_override );
-	replacefunc( getfunction( "maps/mp/zombies/_zm_ai_screecher", "screecher_runaway" ), ::screecher_runaway_override );
-	replacefunc( getfunction( "maps/mp/zombies/_zm_ai_screecher", "screecher_distance_tracking" ), ::screecher_distance_tracking_override );
+	SAFE_REPLACEFUNC( "maps/mp/zm_transit_distance_tracking", "delete_zombie_noone_looking", ::delete_zombie_noone_looking_override );
+	SAFE_REPLACEFUNC( "maps/mp/zombies/_zm_ai_screecher", "zombie_pathing_home", ::zombie_pathing_home_override );
+	SAFE_REPLACEFUNC( "maps/mp/zombies/_zm_ai_screecher", "screecher_runaway", ::screecher_runaway_override );
+	SAFE_REPLACEFUNC( "maps/mp/zombies/_zm_ai_screecher", "screecher_distance_tracking", ::screecher_distance_tracking_override );
 }
 
 delete_zombie_noone_looking_override( how_close )
@@ -185,5 +181,5 @@ getwatcherforweapon( weapname )
 	if ( !isplayer( self ) )
 		return undefined;
 
-	return _weaponobjects::getweaponobjectwatcherbyweapon( weapname );
+	return maps\mp\gametypes_zm\_weaponobjects::getweaponobjectwatcherbyweapon( weapname );
 }
